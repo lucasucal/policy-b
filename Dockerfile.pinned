@@ -1,0 +1,22 @@
+# LOCAL DEVELOPMENT ONLY (Dockerfile.pinned; mirrors pinned-mode judging: `docker build -f Dockerfile.pinned .`).
+# This Dockerfile is NOT used for judging and is ignored at
+# submission: we take only your Python code (plus your Hugging Face model). Any change
+# you make here (base image, installed packages, SDK/runtime, entrypoint, env) has no
+# effect on the judged run.
+#
+# It mirrors the judged environment so you can build and run it locally: it starts
+# FROM the official pinned policy image, puts your repository at /submission and keeps
+# the image's fixed entrypoint (`python -I -m rc_runtime`), exactly as judging does.
+#
+# Build and run (mount your model snapshot at /weights):
+#   docker build -f Dockerfile.pinned -t my-policy .
+#   docker run --rm -p 8080:8080 -v /path/to/snapshot:/weights:ro my-policy
+#
+# The default is the published image v7 (manifest list, resolves to your host's arm64 or amd64
+# platform). Organizers announce a newer release at cutover; then pass it with
+# --build-arg RC_POLICY_IMAGE=<ref>.
+ARG RC_POLICY_IMAGE=ghcr.io/lucasucal/rc-policy@sha256:c82f577d259853f1228054d3c7da6ce935e8e3af62cd1ec0c26008ec3e3318e3
+FROM ${RC_POLICY_IMAGE}
+
+# Code only: no install steps, no ENTRYPOINT/CMD (the image's entrypoint is kept).
+COPY . /submission

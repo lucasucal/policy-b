@@ -1,0 +1,13 @@
+{
+  "_comment_contract": "Contract version. Fixed at v0. Do not change unless told to.",
+  "contract": "v0",
+  "_comment_entry_point": "Pinned runtime (applies once organizers switch to it): module.path:Attr, resolved under the repository root, where Attr is a rc_sdk Policy subclass (or a zero-argument function returning one); or a program that serves the HTTP contract itself (a dotted module or a relative .py path, for example serve.py). The judged image runs it; there is no Dockerfile, no install step. Legacy flow (live today): not used, the Dockerfile CMD names your class.",
+  "entry_point": "serve.py",
+  "_comment_port": "Required integer in the legacy flow. The pinned runtime image always serves on 8080 and the checks accept only 8080 here (or omitted).",
+  "port": 8080,
+  "_comment_weights": "Legacy placeholder fields; they do not select the judged model. Provide your public, ungated Hugging Face model link in the dashboard. Each new submission resolves the snapshot at that link and mounts it at /weights. Never commit weights here.",
+  "weights": {
+    "repo_id": "YOUR-HF-USERNAME/your-weights",
+    "revision": "YOUR-FULL-HF-COMMIT-SHA"
+  }
+}
