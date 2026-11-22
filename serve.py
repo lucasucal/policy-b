@@ -1,4 +1,5 @@
 import json
+import os
 import threading
 import traceback
 
@@ -48,4 +49,4 @@ async def act(request: Request):
 
 if __name__ == "__main__":
     threading.Thread(target=_load, daemon=True).start()
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("RC_POLICY_PORT") or 8080))

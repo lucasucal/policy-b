@@ -16,7 +16,7 @@ from PIL import Image
 from safetensors.torch import load_file
 from transformers import CLIPVisionModelWithProjection, CLIPImageProcessor
 
-ENCODER_ID = "openai/clip-vit-base-patch32"
+ENCODER_SUBDIR = "encoder"
 MAX_DELTA = 0.05
 
 
@@ -31,12 +31,16 @@ def decode(b64: str) -> Image.Image:
 class Controller:
     def __init__(self) -> None:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        enc = weights_dir() / ENCODER_SUBDIR
+        if not (enc / "config.json").is_file():
+            raise RuntimeError(f"{enc} is missing: the encoder must be in the model snapshot")
         self.encoder = CLIPVisionModelWithProjection.from_pretrained(
-            ENCODER_ID,
+            str(enc),
             torch_dtype=torch.bfloat16,
-            attn_implementation="flash_attention_2",
+            attn_implementation="sdpa",
+            local_files_only=True,
         ).to(self.device).eval()
-        self.proc = CLIPImageProcessor.from_pretrained(ENCODER_ID)
+        self.proc = CLIPImageProcessor.from_pretrained(str(enc), local_files_only=True)
         head = load_file(str(weights_dir() / "head.safetensors"))
         self.w1 = head["w1"].float().to(self.device)
         self.b1 = head["b1"].float().to(self.device)
